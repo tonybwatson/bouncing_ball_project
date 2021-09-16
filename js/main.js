@@ -3,6 +3,7 @@
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
+// canvas width and height set to window width/height
 const width = canvas.width = window.innerWidth;
 const height = canvas.height = window.innerHeight;
 
@@ -13,8 +14,9 @@ function random (min, max) {
   return num;
 }
 
-// create ball
-function Ball (x, y, velX, velY, color, size) {
+//create ball
+class Ball {
+  constructor (x, y, velX, velY, color, size) {
     // horizontal and vertical coordinates
     this.x = x;
     this.y = y;
@@ -24,6 +26,7 @@ function Ball (x, y, velX, velY, color, size) {
     // ball color and size
     this.color = color;
     this.size = size;
+  }
 }
 
 // draw ball on screen
@@ -42,26 +45,25 @@ Ball.prototype.draw = function () {
 
 // move the ball
 Ball.prototype.update = function () {
-    // check if ball has reached edge of canvas
-    // - if so, reverse direction to make ball travel in
-    // opposite direction
-
-    // if x coordinate is greater than canvas width (right side)
-    if ((this.x + this.size) >= width) {
-        this.velX = -(this.velX);
-    }
-    // if x coordinate is less than 0 (left side)
-    if ((this.x - this.size) <= 0) {
-        this.velX = -(this.velX);
-    }
-    //if y coordinate is greater than canvas height (off bottom edge)
+    
+    // //if y coordinate is greater than canvas height (off bottom edge)
     if ((this.y + this.size) >= height) {
         this.velY = -(this.velY);
     }
-    // if y coordinate is less than 0 (off top edge)
+    // // if y coordinate is less than 0 (off top edge)
     if ((this.y - this.size) <= 0) {
         this.velY = -(this.velY);
     }
+
+    // move ball to left side of screen if it touches right side
+    if ((this.x + this.size) >= width) {
+        this.x = 0;
+    } 
+    // move ball to right side of screen if it reaches left side
+    if ((this.x + this.size) <= 0) {
+        this.x >= width;
+    }
+
     // add velX and velY to respective coordinates - move ball every time method is called
     this.x += this.velX;
     this.y += this.velY;
@@ -81,6 +83,8 @@ Ball.prototype.collisionDetect = function () {
             // if circles collide, change color to random
             if (distance < this.size + balls[j].size) {
                 balls[j].color = this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')';
+                // change size randomly on impact
+                balls[j].size = random(10, 50);
             }
         }
     }
@@ -101,7 +105,8 @@ while (balls.length < 25) {
         random(-7, 7),
         random(-7, 7),
         'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')',
-        size
+        size,
+        random(1, 25)
     );
 
     // push balls to array
@@ -110,8 +115,8 @@ while (balls.length < 25) {
 
 
 function loop() {
-    // set fill color to semi-transparent black
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    // set fill color to semi-transparent blue
+    ctx.fillStyle = 'rgba(50, 168, 164, 0.25)';
     // draw rectangle of the color across width and height of canvas
     ctx.fillRect(0, 0, width, height);
     // loop through balls in array, run each's draw(), update(), collisionDetect functions, update for next frame
@@ -127,4 +132,10 @@ function loop() {
 
 // call loop function to start animation
 loop();
+
+
+// create player-controlled object
+// make pco change color of other objects on touch
+//make balls move from one side to other (if goes off right side, shows on left side)
+
 
